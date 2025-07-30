@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+</head>
+<body style="background-color: #f4f5f7;">
+<!--NAVBAR-->
+<%- include('components/adminNav') %>
+
+
+<!--PROFIl-->
+<div class="row mt-5 p-2 p-md-5 tekst-center justify-content-center" id="profile" style="background-color: #f4f5f7;">
+    <div class="col-10 col-md-7">
+        <div class="card mb-3" style="border-radius: .5rem;">
+            <div class="row g-0">
+                <div class="col-md-4 gradient-custom text-center text-white" style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
+                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp" alt="Avatar" class="img-fluid my-5" style="width: 80px;" />
+                    <h5 class="text-black"><%= user.ime %> <%= user.prezime %></h5>
+                    <p class="text-black"><%= user.username %></p>
+                    <i class="far fa-edit mb-5"></i>
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body p-4">
+                        <h6>Informacije</h6>
+                        <hr class="mt-0 mb-4">
+                        <div class="row pt-1">
+                            <div class="col-6 mb-3">
+                                <h6>Email</h6>
+                                <p class="text-muted"><%= user.email %></p>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <h6>Grad</h6>
+                                <p class="text-muted"><%= user.grad %></p>
+                            </div>
+                        </div>
+                        <h6>Stručna sprema</h6>
+                        <hr class="mt-0 mb-4">
+                        <div class="row pt-1">
+                            <div class="col-6 mb-3">
+                                <p class="text-muted"><%= user.strucna_sprema %></p>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <h6>God. radnog iskustva u struci </h6>
+                                <p class="text-muted"><%= user.god_radno_iskustvo %></p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="row mt-2 p-5 d-flex align-items-stretch" style="background-color: #f4f5f7;">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Obrazovanje</h5>
+                <p id="education-text" class="card-text"><%= user.obrazovanje %></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Radno iskustvo</h5>
+                <p id="ri-text" class="card-text"><%= user.radno_iskustvo %></p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row p-5 d-flex align-items-stretch" style="background-color: #f4f5f7;">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Biografija</h5>
+                <p id="bio-text" class="card-text"><%= user.biografija %></p>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Komentari</h5>
+                <% if (comments.length > 0) { %>
+                    <ul>
+                        <% comments.forEach(comment => { %>
+                            <li><%= comment.komentar %> <small>(<%= new Date(comment.datum).toLocaleDateString() %>)</small></li>
+                        <% }) %>
+                    </ul>
+                <% } else { %>
+                    <p class="text-muted">Nema komentara.</p>
+                <% } %>
+                <input type="hidden" id="user-id-input" value="<%= user.id %>">
+
+                <p id="komentar-text" class="card-text"><%= user.komentari %></p>
+                <button id="edit-komentar-button" class="btn btn-primary">Dodaj komentar</button>
+
+                <form id="edit-komentar-form" style="display: none;">
+                    <div class="form-group">
+                        <label for="komentar-input">Unesi komentar</label>
+                        <input type="text" id="komentar-input" class="form-control" value="">
+                    </div>
+                    <button type="button" id="save-komentar-btn" class="btn btn-success mt-3">Spasi</button>
+                    <button type="button" id="cancel-komentar-btn" class="btn btn-secondary mt-3">Odustani</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row p-4">
+    <!-- Aktivni konkursi -->
+    <div class="col-12">
+        <h3>Aktivni konkursi</h3>
+    </div>
+    <div class="col-12 table table-responsive">
+        <table class="table">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Konkurs</th>
+                <th scope="col">Firma</th>
+                <th scope="col">Pozicija</th>
+                <th scope="col">Datum prijave</th>
+                <th scope="col">Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% activeJobs.forEach((job, index) => { %>
+                <tr>
+                    <th scope="row"><%= index + 1 %></th>
+                    <td><%= job.naziv %></td>
+                    <td><%= job.naziv_firme %></td>
+                    <td><%= job.pozicija %></td>
+                    <td><%= job.datum_objave.toLocaleDateString() %></td>
+                    <td><%= job.status %></td>
+                </tr>
+            <% }) %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row p-4">
+    <div class="col-12">
+        <h3>Arhivirani konkursi</h3>
+    </div>
+    <div class="col-12  table table-responsive">
+        <table class="table">
+            <thead class="thead-light">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Konkurs</th>
+                <th scope="col">Firma</th>
+                <th scope="col">Pozicija</th>
+                <th scope="col">Datum prijave</th>
+                <th scope="col">Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% archivedJobs.forEach((job, index) => { %>
+                <tr>
+                    <th scope="row"><%= index + 1 %></th>
+                    <td><%= job.naziv %></td>
+                    <td><%= job.naziv_firme %></td>
+                    <td><%= job.pozicija %></td>
+                    <td><%= job.datum_objave.toLocaleDateString() %></td>
+                    <td><%= job.status %></td>
+                </tr>
+            <% }) %>
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+<!--Futer-->
+
+<%- include('components/footer') %>
+
+<script>
+    const editBtnKomentar = document.getElementById('edit-komentar-button');
+    const saveBtnKomentar = document.getElementById('save-komentar-btn');
+    const cancelBtnKomentar = document.getElementById('cancel-komentar-btn');
+    const formKomentar = document.getElementById('edit-komentar-form');
+    const KomentarText = document.getElementById('komentar-text');
+    const KomentarInput = document.getElementById('komentar-input');
+
+    editBtnKomentar.addEventListener('click', () => {
+        KomentarText.style.display = 'none';
+        formKomentar.style.display = 'block';
+        KomentarInput.value = KomentarText.innerText.trim();
+    });
+
+    cancelBtnKomentar.addEventListener('click', () => {
+        formKomentar.style.display = 'none';
+        KomentarText.style.display = 'block';
+    });
+
+    saveBtnKomentar.addEventListener('click', async () => {
+        const newText = KomentarInput.value.trim();
+        const userId = document.getElementById('user-id-input').value;
+
+        console.log("KOMENTAR SE PISE ZA KORISNIKA ", userId);
+
+        if (!newText) {
+            alert('Komentar ne može biti prazan!');
+            return;
+        }
+
+
+        try {
+            const response = await fetch(`/admin/korisnik/${userId}/dodaj-komentar`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ komentar: newText }),
+            });
+
+            if (response.ok) {
+                KomentarText.innerText = newText;
+                formKomentar.style.display = 'none';
+                KomentarText.style.display = 'block';
+            } else {
+                const error = await response.json();
+                alert(`Greška: ${error.error || 'Nepoznata greška.'}`);
+            }
+        } catch (err) {
+            console.error('Greška prilikom slanja komentara:', err);
+            alert('Došlo je do greške. Pokušajte ponovo.');
+        }
+    });
+</script>
+
+<script src="	https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

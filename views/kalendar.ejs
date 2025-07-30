@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalendar</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.js"></script>
+</head>
+<body>
+
+<!--Navigacijaa-->
+    <%- include('components/adminNav') %>
+
+
+
+
+<h2 class="text-center mt-3">Kalendar događaja</h2>
+
+<div id="calendar" class="mb-3"></div>
+<div id="overlay"></div>
+<!-- Forma za dodavanje događaja -->
+<div id="eventForm">
+    <div class="close-btn" id="closeForm">&times;</div>
+    <h3>Dodaj Događaj</h3>
+    <form id="addEventForm">
+        <label for="title">Naziv:</label>
+        <input type="text" id="title" name="title" placeholder="Unesite naziv događaja" required>
+
+        <label for="description">Opis:</label>
+        <input type="text" id="description" name="description" placeholder="Dodajte kratak opis" required>
+
+        <label for="start">Početak:</label>
+        <input type="datetime-local" id="start" name="start" required>
+
+        <label for="end">Kraj:</label>
+        <input type="datetime-local" id="end" name="end" required>
+
+        <button type="submit">Spasi Događaj</button>
+    </form>
+</div>
+
+
+<%- include('components/footer') %>
+
+<script>
+    $(document).ready(function() {
+        $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month'
+            },
+            events: function(start, end, timezone, callback) {
+                $.ajax({
+                    url: '/admin/events',
+                    dataType: 'json',
+                    success: function(data) {
+                        var events = data.map(function(event) {
+                            return {
+                                title: event.title,
+                                start: event.start,
+                                endTime: event.end,
+                                description: event.description
+                            };
+                        });
+                        callback(events);
+                    }
+                });
+            },
+            eventClick: function(event) {
+                alert('Događaj: ' + event.title);
+            },
+            dayClick: function(date, jsEvent, view) {
+                $('#start').val(date.format('YYYY-MM-DDTHH:mm'));
+                $('#eventForm').show();
+                $('#start').val(date.format());
+            }
+        });
+
+        $('#addEventForm').submit(function(e) {
+            e.preventDefault();
+
+            const newEvent = {
+                title: $('#title').val(),
+                description: $('#description').val(),
+                start: $('#start').val(),
+                end: $('#end').val()
+            };
+
+            $.ajax({
+                url: '/admin/events',
+                method: 'POST',
+                data: newEvent,
+                success: function(data) {
+                    $('#eventForm').fadeOut();
+                    $('#overlay').fadeOut();
+                    $('#calendar').fullCalendar('refetchEvents');
+                }
+            });
+        });
+        $('#closeForm, #overlay').on('click', function () {
+            $('#eventForm').fadeOut();
+            $('#overlay').fadeOut();
+        });
+    });
+</script>
+</body>
+</html>
